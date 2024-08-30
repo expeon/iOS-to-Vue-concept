@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to WebView</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    h1 {
+      color: red;
+    }
+
+    .vue h1 {
+      color: blue;
+    }
+
+    p {
+      min-height: 1rem;
+      min-width: 1rem;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    p#testInject {
+      font-size: 1.2em;
+      line-height: 1.5;
+      color: white;
+      background-color: red;
+    }
+
+    p#testVueInject {
+      font-size: 1.2em;
+      line-height: 1.5;
+      color: white;
+      background-color: blue;
+    }
+
+    .button {
+      color: red;
+    }
+
+    .vue {
+      margin-top: 1rem;
+    }
+
+    .vue .button {
+      color: blue;
+    }
+  </style>
+  <script type="text/javascript">
+
+    // iOS ---> JS: injectValue();
+    // iOS ---> Vue: injectVueValue();
+    // JS ---> iOS: sendJsMessageToSwift();
+    // Vue ---> iOS: sendVueMessageToSwift();
+
+    function injectValue(value) {
+      // Find the <p> element with the id "testInject"
+      const paragraph = document.getElementById("testInject");
+
+      // Check if the element exists
+      if (paragraph) {
+        // Inject the provided value into the <p> element
+        paragraph.textContent = value;
+      } else {
+        console.error('Element with id "testInject" not found.');
+      }
+    }
+    function injectVueValue(value) {
+      if (window.myRef) {
+        window.myRef.value = value;
+      }
+    }
+    function sendJsMessageToSwift() {
+      //Add case switches to see if it's iOS or Android, or something else - this is just for iOS
+      window.webkit.messageHandlers.buttonClicked.postMessage("This is a value that came from JS");
+    }
+    function sendVueMessageToSwift(val) {
+      //Add case switches to see if it's iOS or Android, or something else - this is just for iOS
+      window.webkit.messageHandlers.buttonClicked.postMessage(val);
+    }
+
+    window.addEventListener('vue-event', function (event) {
+      sendVueMessageToSwift(event.detail.message);
+      console.log('Event caught in index.html:', event.detail.message);
+      // You can also perform other actions based on the event data here
+    });
+
+
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>This is an HTML</h1>
+    <p id="testInject">This is a part of non-vue html</p>
+    <button class="button" onclick="sendJsMessageToSwift()">Click me!</button>
+    <div id="app"></div>
+  </div>
+</body>
+
+</html>
